@@ -12,11 +12,11 @@
 ;   PF4 is switch input  (1 = switch not pressed, 0 = switch pressed)
 ;   PF3 is LED output    (1 activates green LED) 
 ; The specific operation of this system 
-;   1) Make PF3 an output and make PF4 an input (enable PUR for PF4). 
-;   2) The system starts with the LED OFF (make PF3 =0). 
-;   3) Delay for about 100 ms
-;   4) If the switch is pressed (PF4 is 0),
-;      then toggle the LED once, else turn the LED OFF. 
+;   1) Make PE0 an output and make PE1 an input. 
+;   2) The system starts with the LED ON (make PE0 = 1). 
+;   3) Delay for about 62 ms
+;   4) If the switch is pressed (PE1 is 1),
+;      then toggle the LED once, else turn the LED ON. 
 ;   5) Repeat steps 3 and 4 over and over
 ;*******************************************************************
 
@@ -75,7 +75,7 @@ main
 	; because it will run through all of InitPortF first
 
 loop  
-	BL delay100MS ; We want to delay at the beginning now
+	BL delay62MS ; We want to delay at the beginning now
 	;Read the switch and test if the switch is pressed
 	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of Port E data into R1 so we can use it
 	LDR R0, [R1] ; Load the value at R1 (the port data) into R0
@@ -107,8 +107,8 @@ toggleLED ; Toggles the LED
 	; This will move 0x00 into the Port E data register
 	; which will turn off the LED
 	STR R0, [R1]
-	; Then we need to delay by 100ms
-	BL delay100MS
+	; Then we need to delay by 62ms
+	BL delay62MS
 	; And begin our loop again
 	B loop
 	
@@ -116,22 +116,22 @@ turnOnLED ; Turns the LED on, no matter what state it is in currently
 	MOV R0, #0x01
 	LDR R1, =GPIO_PORTE_DATA_R
 	STR R0, [R1]
-	; Again, we need to delay 100ms
-	BL delay100MS
+	; Again, we need to delay 62ms
+	BL delay62MS
 	; and begin our loop again
 	B loop
 
-delay100MS ; Subroutine that will delay our code by roughly 100ms
-	; To delay the running by about 100ms we need to put
+delay62MS ; Subroutine that will delay our code by roughly 62ms
+	; To delay the running by about 62ms we need to put
 	; a large number into a register and slowly reduce it
-	; so that we take up 100ms worth of cycles
-	; the large number we've chosen is #0x726F1
-	MOV R7, #0x26F1
-	MOVT R7, #0x7
+	; so that we take up 62ms worth of cycles
+	; the large number we've chosen is #0x1F5FF
+	MOV R7, #0xF5FF
+	MOVT R7, #0x1
 delay
 	SUBS R7, R7, #0x01 ; Subtract the current value of R12 by 1 and put it into R12
 	BNE delay ; Compare R12 to 0 and if it is not 0, go back to delay
-	BX LR ; Go back to the line after the delay100MS was called
+	BX LR ; Go back to the line after the delay62MS was called
 	
        ALIGN      ; make sure the end of this section is aligned
        END        ; end of file
