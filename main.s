@@ -65,6 +65,11 @@ InitPortF
 	LDR R1, =GPIO_PORTE_DEN_R
 	STR R0, [R1]
 	
+	; Start with the LED on
+	MOV R0, #0x01
+	LDR R1, =GPIO_PORTE_DATA_R
+	STR R0, [R1]
+	
 main
 	; Nothing needs to be initialized here
 	; because it will run through all of InitPortF first
