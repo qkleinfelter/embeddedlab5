@@ -99,10 +99,10 @@ toggleLED ; Toggles the LED
 	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of the Port F data into R1 so we can use it
 	LDR R0, [R1] ; Load the value at R1 (the port data) into R0
 	; Pin 1 is always on when we call toggleLED
-	CMP R0, #0x10 ; Check if the value in R0 is 10, which indicates pin 0 is off and pin 1 is on, hence the LED is off
+	CMP R0, #0x02 ; Check if the value in R0 is 10, which indicates pin 0 is off and pin 1 is on, hence the LED is off
 	BEQ turnOnLED ; if this value is 10, then that means our LED is currently off and we need to turn it on
 	; Otherwise, just turn off the LED
-	MOV R0, #0x10
+	MOV R0, #0x00
 	LDR R1, =GPIO_PORTE_DATA_R
 	; This will move 0x00 into the Port E data register
 	; which will turn off the LED
