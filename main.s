@@ -110,7 +110,7 @@ toggleLED ; Toggles the LED
 	B loop
 	
 turnOnLED ; Turns the LED on, no matter what state it is in currently
-	MOV R0, #0x08
+	MOV R0, #0x01
 	LDR R1, =GPIO_PORTE_DATA_R
 	STR R0, [R1]
 	; Again, we need to delay 100ms
