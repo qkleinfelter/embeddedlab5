@@ -102,7 +102,7 @@ toggleLED ; Toggles the LED
 	CMP R0, #0x10 ; Check if the value in R0 is 10, which indicates pin 0 is off and pin 1 is on, hence the LED is off
 	BEQ turnOnLED ; if this value is 10, then that means our LED is currently off and we need to turn it on
 	; Otherwise, just turn off the LED
-	MOV R0, #0x00
+	MOV R0, #0x10
 	LDR R1, =GPIO_PORTE_DATA_R
 	; This will move 0x00 into the Port E data register
 	; which will turn off the LED
