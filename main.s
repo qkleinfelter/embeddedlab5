@@ -20,8 +20,8 @@
 ;   5) Repeat steps 3 and 4 over and over
 ;*******************************************************************
 
-GPIO_PORTE_DATA_R       EQU   0x400FE108
-GPIO_PORTE_DIR_R        EQU   0x400243FC
+GPIO_PORTE_DATA_R       EQU   0x400243FC
+GPIO_PORTE_DIR_R        EQU   0x40024400
 GPIO_PORTE_AFSEL_R      EQU   0x40024420
 GPIO_PORTE_DEN_R        EQU   0x4002451C
 GPIO_PORTE_AMSEL_R      EQU   0x40024528
@@ -33,60 +33,36 @@ SYSCTL_RCGCGPIO_R       EQU   0x400FE608
        EXPORT  Start
 Start
 InitPortF
-	; SYSCTL_RCGCGPIO_R = 0x20
-	MOV R0, #0x20
+	; SYSCTL_RCGCGPIO_R = 0x10
+	MOV R0, #0x10
 	LDR R1, =SYSCTL_RCGCGPIO_R
 	STR R0, [R1]
 	
 	LDR R0, [R1] ; Delay before we continue on
-	
-	; Before we write to the CR Register
-	; we need to unlock the port F, using the
-	; constant #0x4C4F434B, however we can't
-	; write this constant directly to using MOV
-	; so we use MOV and MOVT to add it into the register
-	; in 2 parts, note: we must use the MOV command before
-	; MOVT, otherwise the MOV command will overwrite the top
-	; half of the register not unlocking the port
-	; GPIO_PORT_F_LOCK_R = 0x4C4F434B
-	MOV R0, #0x434B
-	MOVT R0, #0x4C4F
-	LDR R1, =GPIO_PORTF_LOCK_R
-	STR R0, [R1]
 
-	; GPIO_PORTF_CR_R = 0x18
-	MOV R0, #0x18
-	LDR R1, =GPIO_PORTF_CR_R
-	STR R0, [R1]
-
-	; GPIO_PORTF_AMSEL_R = 0x00
+	; GPIO_PORTE_AMSEL_R = 0x00
 	MOV R0, #0x00
-	LDR R1, =GPIO_PORTF_AMSEL_R
+	LDR R1, =GPIO_PORTE_AMSEL_R
 	STR R0, [R1]
 	
-	; GPIO_PORTF_PCTL_R = 0x00
+	; GPIO_PORTE_PCTL_R = 0x00
 	MOV R0, #0x00
-	LDR R1, =GPIO_PORTF_PCTL_R
+	LDR R1, =GPIO_PORTE_PCTL_R
 	STR R0, [R1]
 	
-	; GPIO_PORTF_DIR_R = 0x08
-	MOV R0, #0x08
-	LDR R1, =GPIO_PORTF_DIR_R
+	; GPIO_PORTE_DIR_R = 0x01
+	MOV R0, #0x01
+	LDR R1, =GPIO_PORTE_DIR_R
 	STR R0, [R1]
 	
-	; GPIO_PORTF_AFSEL_R = 0x00
+	; GPIO_PORTE_AFSEL_R = 0x00
 	MOV R0, #0x00
-	LDR R1, =GPIO_PORTF_AFSEL_R
+	LDR R1, =GPIO_PORTE_AFSEL_R
 	STR R0, [R1]
 	
-	; GPIO_PORTF_PUR_R = 0x10
-	MOV R0, #0x10
-	LDR R1, =GPIO_PORTF_PUR_R
-	STR R0, [R1]
-	
-	; GPIO_PORTF_DEN_R = 0x18
-	MOV R0, #0x18
-	LDR R1, =GPIO_PORTF_DEN_R
+	; GPIO_PORTE_DEN_R = 0x03
+	MOV R0, #0x03
+	LDR R1, =GPIO_PORTE_DEN_R
 	STR R0, [R1]
 	
 main
@@ -95,7 +71,7 @@ main
 
 loop  
 	;Read the switch and test if the switch is pressed
-	LDR R1, =GPIO_PORTF_DATA_R ; Load the address of Port F data into R1 so we can use it
+	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of Port F data into R1 so we can use it
 	LDR R0, [R1] ; Load the value at R1 (the port data) into R0
 	LSR R0, #4 ; Shift the port data to the right 4 bits since we only need pin 4
 	CBZ R0, toggleLED ; If the value at R0 is 0, we want to toggle the LED
@@ -103,7 +79,7 @@ loop
 	; then all we want to do is toggle off the LED and then
 	; restart the loop
 	MOV R0, #0x00 
-	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R1, =GPIO_PORTE_DATA_R
 	; This will move 0x00 into the Port F data register
 	; which will turn off the LED
 	STR R0, [R1]
@@ -113,13 +89,13 @@ loop
 toggleLED ; Toggles the LED
 	; Read our current Port F data because
 	; we need to check if the LED is on or not
-	LDR R1, =GPIO_PORTF_DATA_R ; Load the address of the Port F data into R1 so we can use it
+	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of the Port F data into R1 so we can use it
 	LDR R0, [R1] ; Load the value at R1 (the port data) into R0
 	LSR R0, #3 ; Shift the port data to the right 3 bits since we only need pin 3 here
 	CBZ R0, turnOnLED ; if this value is 0, then that means our LED is currently off and we need to turn it on
 	; Otherwise, just turn off the LED
 	MOV R0, #0x00
-	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R1, =GPIO_PORTE_DATA_R
 	; This will move 0x00 into the Port F data register
 	; which will turn off the LED
 	STR R0, [R1]
@@ -130,7 +106,7 @@ toggleLED ; Toggles the LED
 	
 turnOnLED ; Turns the LED on, no matter what state it is in currently
 	MOV R0, #0x08
-	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R1, =GPIO_PORTE_DATA_R
 	STR R0, [R1]
 	; Again, we need to delay 100ms
 	BL delay100MS
