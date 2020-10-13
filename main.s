@@ -32,7 +32,7 @@ SYSCTL_RCGCGPIO_R       EQU   0x400FE608
        THUMB
        EXPORT  Start
 Start
-InitPortF
+InitPortE
 	; SYSCTL_RCGCGPIO_R = 0x10
 	MOV R0, #0x10
 	LDR R1, =SYSCTL_RCGCGPIO_R
@@ -75,18 +75,20 @@ main
 	; because it will run through all of InitPortF first
 
 loop  
+	BL delay100MS ; We want to delay at the beginning now
 	;Read the switch and test if the switch is pressed
-	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of Port F data into R1 so we can use it
+	LDR R1, =GPIO_PORTE_DATA_R ; Load the address of Port E data into R1 so we can use it
 	LDR R0, [R1] ; Load the value at R1 (the port data) into R0
-	LSR R0, #4 ; Shift the port data to the right 4 bits since we only need pin 4
-	CBZ R0, toggleLED ; If the value at R0 is 0, we want to toggle the LED
+	LSR R0, #1 ; Shift the port data to the right 1 bits since we only need pin 1
+	CMP R0, #1 ; Compare the value to 1
+	BEQ toggleLED ; If the value at R0 is 1, we want to toggle the LED
 	; If we didn't branch off on the previous instruction,
-	; then all we want to do is toggle off the LED and then
+	; then all we want to do is turn on the LED and then
 	; restart the loop
-	MOV R0, #0x00 
+	MOV R0, #0x01 
 	LDR R1, =GPIO_PORTE_DATA_R
-	; This will move 0x00 into the Port F data register
-	; which will turn off the LED
+	; This will move 0x01 into the Port E data register
+	; which will turn on the LED
 	STR R0, [R1]
 	; go to the beginning of the loop
     B loop
