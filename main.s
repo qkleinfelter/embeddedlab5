@@ -28,10 +28,15 @@ GPIO_PORTE_AMSEL_R      EQU   0x40024528
 GPIO_PORTE_PCTL_R       EQU   0x4002452C
 SYSCTL_RCGCGPIO_R       EQU   0x400FE608
 
+	   IMPORT  TExaS_Init
+
        AREA    |.text|, CODE, READONLY, ALIGN=2
        THUMB
        EXPORT  Start
 Start
+	; TExaS_Init sets bus clock at 80 MHz
+	BL  TExaS_Init ; voltmeter, scope on PD3
+	
 InitPortE
 	; SYSCTL_RCGCGPIO_R = 0x10
 	MOV R0, #0x10
@@ -125,9 +130,9 @@ delay62MS ; Subroutine that will delay our code by roughly 62ms
 	; To delay the running by about 62ms we need to put
 	; a large number into a register and slowly reduce it
 	; so that we take up 62ms worth of cycles
-	; the large number we've chosen is #0x1F5FF
-	MOV R7, #0xF5FF
-	MOVT R7, #0x1
+	; the large number we've chosen is #0xB5000
+	MOV R7, #0x5000
+	MOVT R7, #0xB
 delay
 	SUBS R7, R7, #0x01 ; Subtract the current value of R12 by 1 and put it into R12
 	BNE delay ; Compare R12 to 0 and if it is not 0, go back to delay
