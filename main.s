@@ -35,7 +35,7 @@ SYSCTL_RCGCGPIO_R       EQU   0x400FE608
        EXPORT  Start
 Start
 	; TExaS_Init sets bus clock at 80 MHz
-	BL  TExaS_Init ; voltmeter, scope on PD3
+	BL  TExaS_Init 
 	
 InitPortE
 	; SYSCTL_RCGCGPIO_R = 0x10
